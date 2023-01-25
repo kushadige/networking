@@ -1,0 +1,106 @@
+- How messages are sent between hosts?
+
+	This is layer two concepts most of this stuff and layer three, sometimes..
+	> We need to send a message from host A to host B
+	> Usually a request to do something on host B (RPC)
+		"Hey! I'm sending an RPC call."
+		"Hey, B! Do my work for me, please."
+	> Each host has a network card with a unique Media Access Control address (MAC)
+	> E.g. 00:00:5e:00:53:af
+
+	
+	|¯¯¯¯¯¯¯|			     |¯¯¯¯¯¯¯|
+	|   A   | ------------------ |   B   | 
+	|_______|			     |_______|
+	
+  00:00:5e:00:53:af		 00:00:3a:12:31:0b
+
+	
+	> A sends a message to B specifying the MAC address
+	> Everyone in the network will "get" the message but only B will accept it
+
+	When it sends to network, It has no idea where to send the data exactly.
+	"Hey! let's send a message.. Whoever have this MAC address, please get my message."
+	Then we have to go up to layer two to look at the MAC address and 
+	compare it to ourselves.
+	So everyone, A, B, C, D will get this frame of data. Then we'll look at
+	it says okay this is destined to be "I am B" take it! and send that frame
+	to the higher levels the layer.
+
+	Actually security wise is dangerous. That's how what happened in public Wi-Fi
+	connection.
+
+	//--If you have a sniffer that just gets the MAC address but doesn't really
+	drop it. That's how sniffing networks.
+
+	> Imagine millions of machines?
+	> We need a way to eliminate the need to send it to everyone
+	> The address needs to get better
+	> We need "routability", meet the IP Address..
+
+	
+	> The IP Address is built in two parts.
+	> One part to identify the network, the other is the host.
+	> It 4 bytes but it describes sets of 4 billion devices.
+	> We use the network portion to eliminate many networks.
+	> The host part is used to find the host
+	> Still needs MAC addresses!
+
+
+
+	-Host A on network N1 wants to talk to Host B on network N2
+
+	----------------------------------------------
+	|  			   ||				   |
+	|  |¯¯¯¯¯¯¯|	   ||		   |¯¯¯¯¯¯¯|   |
+	|  |   A   | -----   ||    ----- |   A   |   |
+	|  |_______|     |   ||    |     |_______|   |
+	|  |       |     |         |     |       |   |
+	|  |   B   | ------router------- |   B   |   |
+	|  |_______|     |         |     |_______|   |
+	|  |       |     |   ||    |     |       |   |
+	|  |   C   | -----   ||    ----- |   C   |   |
+	|  |_______|	   ||	         |_______|   |
+	|			   ||                      |
+	|	N1		   ||			N2	   |
+	----------------------------------------------
+	192.168.1.0/24			  192.168.2.0/24
+
+	A: 192.168.1.1			  A: 192.168.2.1
+	B: 192.168.1.2			  B: 192.168.2.2
+	C: 192.168.1.3			  C: 192.168.2.3
+
+
+
+	192.168.1.1 wants to talk to 192.168.2.2 
+	These are different networks. There's something called the subnet mask.
+	You apply that, which is basically this slash 24. And if you get a dif-
+	ferent number, that means you are not in the same network. If you get
+	the same number you're on the same network.
+
+	//--(192.168.1).(1)
+	// First part is the network. Second part is the host.
+
+	If you are not in the same network send the message to the router,
+	which is your gateway, and that gateway take care of routing it to some-
+	where else.
+
+
+	But my host have many apps..
+
+	> It's not enough just to address the host..
+	> The host is runnings many apps each with different requirements.
+	> Meet ports
+	> You can send an HTTP request on port 80, a DNS request on port 53 and
+	a SSH request on port 22 all running on the same server!
+
+	Ports is what? Why do we use here?
+
+	> We use ports in addition to the IP address to know "Okey yea.. The router
+	  did a job deliver the packet to me as a host. But I need to know where do
+	  you want to go, which process? I have thousands of processes"
+	
+	  and that the port, the destination port and the source port is also 
+	  important to understand where exactly you need to go.
+
+
