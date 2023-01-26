@@ -87,22 +87,22 @@
 		Segment -> Packet -> Frame
 
 
-		| 	 		 Application			|
+		| 	 		   Application				|
 						|
 						v
-		|	 		 Presentation			|
+		|	 		   Presentation				|
 						|
 						v
-		|	   		   Session				|
+		|	   		     Session				|
 						|
 						v
-		|   (SourcePort)-Layer4(Transport)-(DestPort)	|
+		|  	    (SourcePort)-Layer4(Transport)-(DestPort)		|
 						|
 						v
-		|	  (SourceIP)-Layer3(Network)-(DestIP)	|
+		|	       (SourceIP)-Layer3(Network)-(DestIP)		|
 						|
 						v
-		|	 (SourceMAC)-Layer2(DataLink)-(DestMAC)	|
+		|	      (SourceMAC)-Layer2(DataLink)-(DestMAC)		|
 						|
 						v
 					     ...
@@ -123,13 +123,13 @@
 	they peek at the content, they take a finite amount of time because they make
 	decisions based on this peeking of the data.
 	
-	     -Client-						      -Server-
+	     -Client-					     -Server-
 
-	| |Application |						   |Application | ^
-	| |Presentation|						   |Presentation| |
-	| |Session	   |				  -Router-	   |Session	    | |
-	| |Transport   |	   -Switch-		 		   |Transport   | |
-	| |Network     |	    	          ^ |Network   | | |Network     | |
+	| |Application |				   |Application | ^
+	| |Presentation|				   |Presentation| |
+	| |Session     |		      -Router-	   |Session	| |
+	| |Transport   |    -Switch-		 	   |Transport   | |
+	| |Network     |	    	  ^ |Network   | | |Network     | |
 	| |Data Link   | ^ |Data Link | | | |Data Link | | |Data Link   | |
 	v |Physical    | | |Physical  | v | |Physical  | v |Physical    | |
 
@@ -153,14 +153,14 @@
 	
 	*Add a firewall!
 
-	            			     -Load Balancer/    
-	    -Client-				     CDN-		  -Server-
+	            			   -Load Balancer/    
+	    -Client-				CDN-	       -Server-
 
-	| |Application |	   -Proxy/	    ^ |Application | | |Application | ^
-	| |Presentation|	   Firewall-    | |Presentation| | |Presentation| |
-	| |Session	   |	   		    | |Session     | | |Session     | |
+	| |Application |      -Proxy/	  ^ |Application | | |Application | ^
+	| |Presentation|     Firewall-    | |Presentation| | |Presentation| |
+	| |Session     |	          | |Session     | | |Session     | |
 	| |Transport   | ^ |Transport | | | |Transport   | | |Transport   | |
-	| |Network     | | |Network  	| | | |Network     | | |Network     | |
+	| |Network     | | |Network   | | | |Network     | | |Network     | |
 	| |Data Link   | | |Data Link | | | |Data Link   | | |Data Link   | |
 	v |Physical    | | |Physical  | v | |Physical    | v |Physical    | |
 	
