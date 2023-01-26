@@ -1,0 +1,140 @@
+- Address Resolution Protocol (ARP)
+
+	Although this is not entirely an IP protocol, it is used to identify
+	one of the IP information, which is the IP Address.
+
+	What if you know the IP address but you don't know the MAC, which is 
+	the most of the situation, right? Why?
+
+	Because most of the time users know the address, they don't memorize
+	IP addresses. If you know the hostname, we use DNS to get the IP address.
+	And if you know the IP address, you almost never memorized the MAC.
+	
+	So in a way to map the IP address down to a MAC address, that's we need
+	to ARP. 
+
+	- Why ARP?
+
+	> We need the MAC address to send frames (layer 2)
+	> Most of the time we know the IP address but not the MAC
+	> ARP Table is a cached representation that maps IP addresses
+	  to MAC mapping. IP->MAC 
+
+
+		* Network Frame
+
+	  |¯¯¯¯¯¯¯|	                    |¯¯¯¯¯¯¯|
+	  |   A   | ------router------- |   B   | 
+ 	  |_______|		                |_______|
+	
+    IP : 10.0.0.2		            IP : 10.0.0.5
+    MAC: aa:bc:32:7f:c0:07          MAC: bb:ab:dd:11:22:33
+					      Port: 8080
+    
+
+		> 10.0.0.2 wants to send a get request to 10.0.0.5
+
+			REQUEST:	| aa:bc:32:7f:c0:07 | 10.0.0.2 | 2312 | GET/ | 8080 | 10.0.0.5 | ??:??:??:??:??:?? |
+								srcMAC		    srcIP	 port   App    port    destIP  	      destMAC
+
+			
+			It don't know that the destionation MAC address either is a 10.0.0.5 because it never talked
+			to it before, if it is we could see that the record of the IP-MAC match of 10.0.0.5 in 10.0.0.2's ARP table.
+			
+
+					ARP A
+
+			|¯¯¯¯¯¯¯¯¯¯|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|
+			|    IP    |        MAC        |
+			|__________|___________________|
+			|          |                   |
+			| 10.0.0.2 | aa:bc:32:7f:c0:07 |
+			|__________|___________________|
+
+			
+			- How can it know that?
+			
+			* 10.0.0.2 wants to connect to 10.0.0.5
+			* Host 10.0.0.2 checks if host 10.0.0.5 is within its subnet, it is.
+			* Host 10.0.0.2 needs the MAC address of 10.0.0.5
+			* That means it can directly inserts the MAC address of that device.
+			Because it's the same subnet. It can know the MAC address.
+			* Host 10.0.0.2 checks its ARP tables and its not there.
+			"Did I ever visited host 10.0.0.5 ever at all? Do I have the MAC
+				address of 10.0.0.5?" Nope.
+			* Host 10.0.0.2 will sends an ARP request broadcast to all machines in
+			its network.
+			* "Who has IP address 10.0.0.5?" everybody gets it.
+			* Host 10.0.0.5 replies with bb:ab:dd:11:22:33
+			"Hey! its me its bb:ab:dd:11:22:33!"
+			* Host 10.0.0.2 updates its ARP Table.
+
+
+					ARP A
+
+			|¯¯¯¯¯¯¯¯¯¯|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|
+			|    IP    |        MAC        |
+			|__________|___________________|
+			|          |                   |
+			| 10.0.0.2 | aa:bc:32:7f:c0:07 |
+			|__________|___________________|
+			|          |                   |
+			| 10.0.0.5 | bb:ab:dd:11:22:33 |
+			|__________|___________________|
+
+
+
+			* And then inserts that as its destination MAC address.
+
+			REQUEST:	| aa:bc:32:7f:c0:07 | 10.0.0.2 | 2312 | GET/ | 8080 | 10.0.0.5 | bb:ab:dd:11:22:33 |
+							srcMAC		   srcIP	 port   App    port    destIP  	     destMAC
+
+
+
+			So next one to want to talk 10.0.0.5, it doesn't need to do that ARP
+			Broadcast anymore. Because it has a cache in its table.
+
+
+
+		> 10.0.0.2 (aa:bc:32:7f:c0:07) wants to connect to IP 1.2.3.4 (??:??:??:??:??:??) (outside of subnet)
+
+			* Host 10.0.0.2 checks if 1.2.3.4 is within its subnet, it is NOT.
+			* Host 10.0.0.2 needs to talk to its gateway.
+				
+				> Even if its gateway doesn't know, it will know someone
+				who does.
+				> But if we want to talk to the gateway, we need the MAC address
+				of the gateway.
+			
+			* Host 10.0.0.2 needs the MAC address of the gateway
+			* Host 10.0.0.2 checks its local ARP table, 10.0.0.1 is not it in
+			* Host 10.0.0.2 sends an ARP request to everybody in the network
+			* Who has 10.0.0.1? (A Dangerous question :) Because if you send that
+			question, everybody will get it. And someone can fake that answer, since
+			they do have that gateway. And machine X can reply with itselves MAC before 
+			the router. (ARP Poisoning)
+
+			* Gateway reply with ab:cd:ef:12:34:56
+
+
+					ARP A
+
+			|¯¯¯¯¯¯¯¯¯¯|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|
+			|    IP    |        MAC        |
+			|__________|___________________|
+			|          |                   |
+			| 10.0.0.2 | aa:bc:32:7f:c0:07 |
+			|__________|___________________|
+			|          |                   |
+			| 10.0.0.5 | bb:ab:dd:11:22:33 |
+			|__________|___________________|
+			|          |                   |
+			| 10.0.0.1 | ab:cd:ef:12:34:56 |
+			|__________|___________________|
+
+
+			* NAT (Network Address Translation) than kicks in.
+
+
+
+
