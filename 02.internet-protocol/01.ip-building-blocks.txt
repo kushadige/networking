@@ -1,0 +1,64 @@
+Building blocks that we need to understand in order to understand
+the IP Protocol.
+
+- What happened when you actually route a packet? What happened
+  when I sending a packet?
+
+	Packet is a bunch of data with destination IP address, with source
+	IP address. (with other headers)
+
+	IP Adress
+	> Layer 3 property
+	> Can be set automatically or statically
+	> Network and Host portion
+	> 4 bytes in IPv4 - 32 bits
+
+	Network vs Host
+	> a.b.c.d/x (a.b.c.d are integers) x is the network bits and remains
+	are host
+	> Example 192.168.254.0/24
+	> The first 24 bits (3 bytes) are network the rest 8 are for host
+	> This means we can have 2^24 (16777216) networks and each network has
+	2^8 (255) hosts
+	> Also called a subnet
+
+	Subnet Mask
+	> 192.168.254.0/24 is also called a subnet
+	> The subnet must have a subnet mask 255.255.255.0
+	> Subnet mask is used to determine whether an IP is in the same subnet
+
+	*You want to know that is this IP address that I'm about to send to
+	belong to my subnet or not. If it's in my subnet, I can use the MAC address
+	to send it directly (h2h). If it's not I need to talk to someone who knows how to
+	route this and this is usually called a router or a gateway.
+	That's why you have a gateway IP address.
+
+
+	Default Gateway
+	> Most networks consists of hosts and a Default Gateway
+	> Host A can talk to B directly if both are in the same subnet
+	> Otherwise A sends it to someone who might know, the gateway
+	> The Gateway has an IP Address and each host should know its gateway
+
+	The gateway is just another device that happened to have two network interfaces.
+	One network that is assigned to belong to this network, and another network
+	that belongs to another network or maybe three or for or five or six...
+
+
+	E.g. Host 192.168.1.3 wants to talk to 192.168.1.2
+	> 192.168.1.3 applies subnet mask to itself and the destination
+	 IP 192.168.1.2
+	> 255.255.255.0 & 192.168.1.3 = 192.168.1.0
+	> 255.255.255.0 & 192.168.1.2 = 192.168.1.0
+	> Same subnet ! no need to route
+
+	E.g. Host 192.168.1.3 wants to talk to 192.168.2.2
+	> 192.168.1.3 applies subnet mask to itself and the destination
+	 IP 192.168.2.2
+	> 255.255.255.0 & 192.168.1.3 = 192.168.1.0
+	> 255.255.255.0 & 192.168.2.2 = 192.168.2.0
+	> Not the subnet ! The packet is sent to the Default Gateway
+	 192.168.1.100
+
+
+	

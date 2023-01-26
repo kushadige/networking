@@ -1,0 +1,36 @@
+- Internet Control Message Protocol - ICMP
+
+	ICMP is one of the most critical protocols that lives in layer three.
+	
+	> Stands for Internet Control Message Protocol
+	> Designed for informational messages
+		* Host unreachable, port unreachable, fragmentation needed
+		* Packet expired (infinite loop in routers)
+	> Uses IP directly
+	> PING and traceroute use it
+	> Doesn't require listeners or ports to be opened
+	
+	//--There is no port to listen to get the ICMP messages.
+	//--You can send an ICMP message any time you want, as long as
+	  the host itself enables ICMP.
+
+	ICMP header
+
+	https://datatracker.ietf.org/doc/html/rfc792
+	https://tr.wikipedia.org/wiki/Internet_Control_Message_Protocol
+
+	> Some firewalls block ICMP for security reasons
+	> This is why PING might not work in those cases
+	> Disabling ICMP also can cause real damage with connection establishment
+	      (TCP blackhole)
+	  	* Fragmentation needed
+
+
+- PING
+
+- TraceRoute
+
+	> Can you identify the entire path your IP Packet takes?
+	> Clever use of TTL
+	> Increment TTL slowly and you will get the router IP address for each hop
+	> Doesn't always work as path changes and ICMP might be blocked

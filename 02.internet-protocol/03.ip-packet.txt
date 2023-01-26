@@ -1,0 +1,180 @@
+- Anatomy of the IP Packet
+
+	> The IP Packet has headers and data sections
+	> IP Packet header is 20 bytes (can go up to 60 bytes if options are enabled)
+	> Data section can go up to 65536
+	 (That's because the length of the data itself is as 16 bit)
+	> You can only address up to 16 bit worth of content that's equal to the 
+	 equivalent to 65536. (65536 bytes total)
+
+	//--Nigel Algorithm
+	//--MTU(Maximum Transmission Unit)
+
+	Maximum Transmission Unit it in the Internet is 1500.
+	So what packet and avoid all the ideas or fragmentations you can't really shove
+	more than 1500 words around in IP packet without a fragmentation.
+
+	
+	* IP Packet to the Backend Engineer
+	_______________________________________________
+	|           |                     |           |
+	| Source IP |         Data        | Dest. IP  |
+	|           |                     |           |
+	¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+
+
+	* Actual IP Packet
+       
+	--------------------------------------------------------------------------------------------------------------------
+	| Offsets | Octet  |           0           |           1           |           2           |           3           |
+	|---------|--------|-----------------------|-----------------------|-----------------------------------------------|
+	|  Octet  |  Bit   |00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|
+	|---------|--------|-----------------------|-----------------------|-----------------------------------------------|
+	|    0    |   0    |  Version  |    IHL    |      DSCP       | ECN |                 Total Length                  |
+	|---------|--------|-----------------------------------------------|-----------------------------------------------|
+	|    4    |   32   |                Identification                 |  Flags |           Fragment Offset            |
+	|---------|--------|-----------------------------------------------|-----------------------------------------------|
+	|    8    |   64   |      Time To Live     |        Protocol       |                Header Checksum                |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    12   |   96   |                                      Source IP Address                                        |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    16   |   128  |                                      Source IP Address                                        |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    20   |   160  |                                                                                               |
+	|---------|--------|                                                                                               |
+	|    ..   |   ...  |                                      Options (if IHL>5)                                       |
+	|---------|--------|                                                                                               |
+	|    56   |   448  |                                                                                               |
+	-------------------|-----------------------------------------------------------------------------------------------|
+	                   |                                                                                               |
+	                   |                                                                                               |
+	                   |                                             Data                                              |
+	                   |                                                                                               |
+	                   |                                                                                               |
+	                   -------------------------------------------------------------------------------------------------
+
+
+
+
+	*Data portion goes up to 64 kilobytes
+
+	*Version ->"What's the version of this either 4 or 6?"
+
+	*IHL - Internet Header Length -> Defines the Options length (By default 5 - 0011)
+
+	*Total Length   -> 16 bit Data + header
+
+	*Identification -> this is the id of a fragment. if you have 1 packet that a fragment
+				into 4. So this is 1, 2, 3, 4. Identifications of frame
+
+	*Flags -> "Hey! Should I fragment or should I not fragment?"
+		     So this is a flag that literally tells the client "Am I supposed to break
+		     this big packet if the MTU is too small or not?"
+
+
+
+	- Fragmentation - Jumbo packets
+
+	//-- Stream Fragmentation and Reassembly Attacks / https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport-06#section-13.3
+
+	> What is fragmentation really?
+		
+		MTU-Maximum Transmission Unit, which is the "frame" size.
+		By default the IP package should fit nicely into a single frame.
+		And if it doesn't fit, that means if the IP packet is large for
+		reason let's say the MTU's 1500 and the IP Packet is 2000 then
+		you have 2 options here:
+
+		1. You can either tell the client whoever sent this packet: 
+			"Hey MTU too small. I can't fit this large packet that 
+			 you sent in that MTU. Fail!"
+		   	
+			* It will send a message with ICMP.
+			 
+			 //--ICMP messages are sent through this protocol. 
+				ping, tracert etc..
+
+		2. Fragment the IP packet.
+			"IP Packet. 2000.. All right, let's put 1500 in one frame
+			 and the 500 goes another frame"
+		 	
+			* So you have 1 IP packet that had been fragmented into 2 frames.
+			Those frames will be sent as two frames.
+
+			* The 2 Frames will arrive, so the host has to understand that
+			this frame belongs to a something that was fragmented and tried
+			to assemble. So there is assemblage that needs to require.
+
+			* Assembly the fragment is one of the most dangerous thing. Just
+			because people can fake fragmentation.
+
+			* On the other hand one frame might fail you have to resend it.
+			And how do you send just part of the fragment? It's very complicated..
+		
+
+		QUICK is a good example. QUICK the protocol that disables the IP fragmentation 
+		because it causes so all sorts of things like if the packet is so large or etc etc..
+
+
+
+	*Time To Live (TTL) -> Every IP packet has a bit, actually 8 bits, that represent a counter.
+
+		>Why do we have Time To Live?
+			
+			The idea of routing the packet can go into different routes and they can end up
+			into a situation where they will go into an infinite loop. The packet can go
+			infinitely. And you have no idea if you visit "this" because the routers are
+			not stateful. They don't save the state. IP Protocol is stateless they don't save
+			the state of that protocol unlike the layer 4 where we have states, we have session
+			all that stuff.. IP is just stateless. IP packets just passing through.
+
+			The TTL is come out for prevent packets from roaming around the internet forever.
+			If the TTL reach zero, whoever decremented it to zero must stop, must drop the packet
+			and must send back an ICMP message. "packet timeout". It will send it back to whomever
+			was that the source IP address.
+
+
+	*Protocol -> Whatever the content of the IP data itself, that's the protocol. (ICMP, TCP, UDP..)
+
+	*Source&Destination IP 
+		//--Spoofing
+
+	*ECN - Explicit Congestion Notification
+		
+		Congestion is when packets start to drop. IP packets will be
+		arrived at routers like floods. Packets are coming through
+		routers, at the end of the day routers, to process this packets,
+		they needs an instant thin amount of memory called a buffer, to put the packets in.
+		This memory fills up. If you have too many packets or your router
+		is slower like it does a lot of stuff to parse. More work means more time.
+		More time means queue will go longer and the buffer will fill. If the buffer
+		fills, that means you cannot accept more packets. That means you have to drop
+		incoming packets.
+
+		Any packets that comes, the controller of the router will drop the packet. And when
+		that happens, that indicates something called "congestion".
+			"Hey, the network is congested!" or "These routers are having a hard time
+			 processing packets. Stop!"
+
+		So there is a whole solution to congestion control, control the traffic in Internet,
+		that's called congestion control.
+
+		For the longest time, routers always drop the packets. It doesn't even send any
+		message or anything like that. Just drop it and leave it alone. Doesn't even send
+		an ICMP message. So the client have to guess "Okey, my packet had timed out. I don't
+		see an acknowledgment. I'm going to assume it's going as dropped and I'm going to
+		assume congestion". That's what happens. We need better communication. 
+		Meet "ECN".
+
+		The router when their buffer fills up, they will take the packets and says "I'm going
+		to actually not drop it. My buffer is about to fill. ECN set the bit to one! set it to true!"
+		boom! notification. And then it will actually process. So the receiver will see that bit
+		that "Uh some of the routers experience congestion. I better tell the receiver."
+
+		So the TCP layer takes control "Wow we experience congestion" and then the client will start 
+		communication at the higher levels of the TCP transport layer.
+
+	//--Black hole TCP connection
+		
+			
+
