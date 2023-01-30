@@ -1,0 +1,115 @@
+- UDP - What is UDP?
+	
+	A very critical protocol that is used very widely and is sits on top
+	of the Internet Protocol.
+
+	> UDP stands for User Datagram Protocol
+	> Layer 4 protocol
+	> Ability to address processes in a host using ports.
+	> Simple protocol to send and receive data.
+	> Prior communication not requires (double edge sword)
+	> Stateless no knowledge is stored on the host
+	> 8 byte header Datagram
+
+	Hosts can have many applications running and we can send to the same
+	IP address multiple requests that goes through multiple application in
+	the same host and uniqely identify them by the port.
+
+	It's basically like a simpler set TCP includes kind of UDP.
+
+	There is no state stored in the server, just like IP. We don't store
+	anything in the router or the machine about the IP packets, about the UDP.
+	You send a datagram, it arrives, and it goes away..
+
+	
+	UDP Use Cases
+
+	* Video streaming
+		-You don't really care if some of the video frames are dropped..
+		 UDP is not really guaranteed delivery.
+		 So as a result, if you want to send a lot of huge data that you don't
+		 really care about consistency 100%.
+	* VPN (Virtual Private Network)
+		-Some of VPN uses UDP for implementations (OpenVPN). Actually most VPN's use IP 
+		 directly.. It's IP in IP.. "Hey, put an IP in another IP packet". So your IP packet 
+		 that gets sent regardless the naked IP packet, the VPN will put it in another 
+		 IP packet and encrypts that. And that IP packet will be destined to the VPN server.
+		 So all where your ISP sees is a flood of IP packets going to one server. But
+		 the VPN will unpack that IP packet and we'll see another IP packet inside it
+		 that goes to the actual correct destination. That's why the VPN knows where
+		 you're going, but the ISP doesn't.
+		
+	* DNS (Domain Name Server)
+		-Resolves the hostname to an IP address. That IP packets can be sent to because
+		 you cannot send IP packet to a name string. So you need this protocol to flip the
+		 hostname to an IP. And every time you have a mapping you have poisoning.. So there is 
+		 something called DNS poisoning. ARP converts IP addresses to MAC. There is something
+		 called ARP poisoning. So there's DNS poisoning where someone intercept this UDP packet
+		 and change them to point to somewhere else. Someone can go to google.com, send a UDP
+		 datagram, intercepts it and the response back was like, "Hey, this is actually google.com"
+		 and puts the IP address of an attacker server.
+
+	* WebRTC (Web Real Time Communication)
+		-It's a very popular web protocol that uses UDP because UDP is not expose directly as a 
+		 raw socket in the browser. You can use WebRTC to communicate between two peers directly
+		 through UDP effectively.
+
+	//--Game implementation usually use UDP because they don't want the extra overhead that TCP has.
+
+
+- Multiplexing and demultiplexing
+
+	> IP target hosts only
+	> Hosts run many apps each with different requirements
+	> Ports now identify the "app" or "process"
+	> Sender multiplexes all its apps into UDP
+	> Receiver demultiplex UDP datagrams to each app.
+
+	The idea of multiplexing is "Take multiple input and shove it into one". The idea of demultiplexing
+	"Take one input put it into multiple output". And that's what it is. Because the idea we have now
+	different apps each have different port, but we have one IP address. All of these will be shoved into 
+	one wire as a single IP packet that goes to a single destination. So you're multiplexing multiple
+	inputs into one and then you're demultiplexing it into the actual target applications.
+	So you can send to port 53, you can send a packet to port 68, and you can send a packet to port 69.. 78..
+	And then you always need a source port. Why do we need the source port? Because how do you know how to
+	send the data back?
+
+
+		|¯¯¯¯¯¯¯|                     |¯¯¯¯¯¯¯|
+		|   A   | ------------------- |   B   | 
+		|_______|                     |_______|
+
+		10.0.0.1                      10.0.0.2
+
+	    App1-port 5555                AppX-port 53
+	    App2-port 7712                AppY-port 68
+	    App3-port 2222                AppZ-port 6978
+
+	> Source and Destination Port
+
+		* App1 on 10.0.0.1 sends data to AppX on 10.0.0.2
+		* Destination Port = 53
+		* AppX responds back to App1
+		* We need Source Port so we know how to send back data
+		* Source Port = 5555
+
+	
+		---------------------------------------->
+	
+		|srcMAC|10.0.0.1|5555|53|10.0.0.2|destMAC|
+
+
+		|srcMAC|10.0.0.2|53|5555|10.0.0.1|destMAC|
+
+		<-----------------------------------------
+
+
+		//----53 is actually a DNS server port.
+
+
+- How to view the list of open ports in Windows
+
+	> Open the command line. See this article for instructions.
+	> Enter the command "netstat -a"
+	> Press Enter on the keyboard.
+

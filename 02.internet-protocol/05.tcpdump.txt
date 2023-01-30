@@ -1,0 +1,47 @@
+- tcpdump
+
+	Actually you can use it for any protocol, almost any protocol
+	that includes TCP and anything underneath it or above it. IP or it 
+	detects ARP, detects ICMP.
+
+
+	>Capture for ARP
+	
+	*tcpdump -i  //interface
+	
+	When you have a computer you might have multiple network interfaces.
+	One for your Wi-Fi, one for your lan, one for your Docker container..
+	You can create virtual interfaces. My interface called "en0"
+
+	//--You can know your interface by running ifconfig or ipconfig(in windows)
+	//--netsh int ipv4 show interfaces
+	//--netsh int ipv4 show
+	//--netsh wlan show interfaces
+	//--\Device\NPF_{GUID}
+	//--windump -i "\Device\NPF_{9e95f1c0-50d9-46bf-89ac-f8aef837d482}"
+
+	*tcpdump -i en0 arp
+	102178 ARP, Request who-has gateway.home.local (Broadcast) tell ipcam.home.local, length 46
+
+	*tcpdump -n -i en0 arp
+	863000 ARP, Request who-has 192.168.254.129 (aa:fe:43:25:1a:3b) tell 192.168.254.144, length 28
+	597273 ARP, Reply 192.168.254.129 is-at aa:fe:43:25:1a:3b, length 28
+	030387 ARP, Announcement 192.168.254.145, length 46
+
+	you can see all these arp request going through..
+
+
+	>Capture for ICMP
+
+	*tcpdump -n -i en0 icmp
+	487210 IP 192.168.254.144 > 93.184.216.34: ICMP echo request, id 38874, seq 0, length 64
+	503957 IP 93.184.216.34 > 192.168.254.144: ICMP echo reply, id 38874, seq 0, length 64
+
+	*tcpdump -n -v -i en0 icmp (verbose mode)
+
+	*tcpdump -n -v -i en9 src 93.184.216.34
+	  "Please capture IP packets coming from this IP address.."
+	
+	*tcpdump -n -v -i en9 src 93.184.216.34 or dst 93.184.216.34 
+
+	*man tcpdump

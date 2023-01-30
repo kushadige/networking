@@ -1,0 +1,64 @@
+- The anatomy of the UDP datagram
+
+	> UDP Header is 8 bytes only (IPv4)
+	> Datagram slides into an IP packet as "data"
+	> Port are 16 bit (0 to 65535)
+
+
+	--------------------------------------------------------------------------------------------------------------------
+	| Offsets | Octet  |           0           |           1           |           2           |           3           |
+	|---------|--------|-----------------------|-----------------------|-----------------------------------------------|
+	|  Octet  |  Bit   |00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|
+	|---------|--------|-----------------------------------------------|-----------------------------------------------|
+	|    0    |   0    |                  Source Port                  |               Destination Port                |
+	|---------|--------|-----------------------------------------------|-----------------------------------------------|
+	|    4    |   32   |                     Length                    |                   Checksum                    |
+	-------------------|-----------------------------------------------------------------------------------------------|
+	                   |                                                                                               |
+	                   |                                                                                               |
+	                   |                                             Data                                              |
+	                   |                                                                                               |
+	                   |                                                                                               |
+	                   -------------------------------------------------------------------------------------------------
+
+
+	//--https://www.ietf.org/rfc/rfc768.txt
+	//--https://en.wikipedia.org/wiki/User_Datagram_Protocol
+
+	How many applications can send DNS packets to the same destination? (srcIP fixed, destIP fixed, destPORT fixed)
+	You can only 65.535 apps or processes can uniquely send.
+
+
+	*Length -> "What's the length of this data?"
+
+
+
+- UDP Pros and Cons
+
+	Pros:
+	* Simple protocol
+	* Header size is small so datagrams are small
+	* Uses less bandwidth
+	* Stateless
+	* Consumes less memory (no state stored in the server/client)
+	* Low latency - no handshake, order, retransmission or guaranteed delivery.
+
+	Cons:
+	* No acknowledgement
+	* No guarantee delivery
+	* Connection-less - anyone can send data without prior knowledge
+	* No flow control
+	* No congestion control
+	* No ordered packets
+	* Security - can be easily spoofed 
+
+
+
+
+
+
+
+
+
+
+
