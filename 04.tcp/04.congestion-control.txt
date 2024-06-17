@@ -1,0 +1,70 @@
+- Congestion Control
+
+    How much the network can handle?
+
+    > The receiver might handle the load but the middle boxes might not
+    > The routers in the middle have limit
+    > We don't want to congest the network with data
+    > We need to avoid congestion
+    > A new window: Congestion Window (CWND)
+
+- Two Congestion algorithms
+
+    > TCP Slow Start (exponential)
+        *   Start slow goes fast!
+        *   CWND + 1 MSS(Maximum Segment Size) after each ACK
+
+        With every acknowledgement that we get, we increase one MS
+
+        Maximum Segment Size can be 1460 bytes.
+
+        Receiver Window we established receiver will handle a lot up to 1GB some receivers will handle, but will your Congestion Window can handle up to 1GB? NO, your networks in the middle will die..
+
+    > Congestion Avoidance (linear)
+        *   Once Slow start reaches its threshold this kicks in
+        *   CWND + 1 MSS after complete RTT (Roundtrip Time)
+
+        If you send like five segments, you got to wait for the 5 to be acknowledged.
+
+        Let's say you acknowledge numer 2 and then number three ... and finally acknowledge 5. That's one round trip.
+
+    > CWND must not exceeds RWND
+
+
+- Slow Start
+
+    > CWND starts with 1 MSS (or more)
+    > Send 1 Segment and waits for ACK
+    > With EACH ACK received CWND is incremented by 1 MSS.
+    > Until we reach slow start threshold we switch to congestion avoidence algorithm.
+
+    04.slow_start_algorithm.png IMAGE
+
+
+- Congestion Avoidance
+
+    > Send CWND worth of Segments and waits for ACK
+    > Only when ALL segments are ACKed add UP to one MSS to CWND
+    > Precisely CWND = CWND + MSS*MSS/CWND
+
+    04.congestion_avoidance_algorithm.png IMAGE
+
+
+- Congestion Notification
+
+    > We don't want routers dropping packets
+    > Can Routers let us know when congestion hit?
+    > Meet ECN (Explicit Congestion Notification)
+    > Routers and middle boxes can tag IP packets with ECN
+    > The receiver will copy this bit back to the sender
+    > ECN is IP Header bit
+    > So Routers don't drop packets just let me know you are reaching your limit
+
+
+- Summary
+
+    > While the receiver may handle large data middle boxes might not
+    > Middle routers buffers may fill up
+    > Need to control the congestion in the network
+    > Sender can send segments up to CWND or RWND without ACK
+    > Isn't normally a problem in hosts connected directly (LAN)

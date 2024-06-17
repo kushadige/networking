@@ -1,0 +1,169 @@
+- TCP - What is TCP?
+
+	> TCP stands for Transmission Control Protocol
+	> Layer 4 protocol
+	> Ability to address processes in a host using ports.
+	> "Controls" the transmission unlike UDP, which is a firehose.
+	> Connection
+	> Requires handshake
+	> 20 bytes headers Segment (can go to 60)
+    > Stateful
+
+    Connection means there is knowledge between the client and the server and this knowledge is a state they store on both the server and the client.
+
+
+- TCP Use cases
+
+    > Reliable communication
+    > Remote shell
+    > Database connections
+    > Web communications
+    > Any bidirectional communication
+
+    All web stuff is done through the HTTP protocol. HTTP is built on TCP (HTTP1 and HTTP2). HTTP3 is built in QUICK, which is built on UDP, which is a whole revamping of the TCP. QUICK is exactly like TCP, but it is rebuilt with more features and with awareness when it comes to the content that is being sent, there's streams..
+
+
+- TCP Connection
+
+    > Connection is a Layer 5 (session)
+    > Connection is an agreement between client and server
+    > Must create a connection to send data
+    > Connection is identified by 4 properties
+        - SourceIP-SourcePort
+        - DestinationIP-DestinationPort
+
+    We have knowledge between the client and the server. We establish knowledge. We handshake. And then once I know you, I'm going to save a state. I'm going to save a session and Layer 5 that identifies you.
+
+    All these four properties which are from Layer 4 and Layer 3 are taken the operating system hash it and preserve one hash.
+
+    And that hash is locked up in a lookup in the operating system and that matches something called a file descriptor in the operating system.
+
+    And that file descriptor contains the session effectively the state and this is usually in memory but it could also can be preserved disk.
+
+    That's how you know if there is a connection or not. You hash it and you lookup. If it's there, you have a connection. If it's not there, fail or drop the segment or return ICMP message saying, "Hey, whou are you?".
+
+
+    > Can't send data outside of a connection
+    > Sometimes called socket or file descriptor
+    > Requires a 3-way TCP handshake
+    > Segments are sequenced and ordered.
+    > Segments are acknowledged.
+    > Lost segments are retransmitted.
+
+    The concept of a socket or file descriptor is a Layer 5 thing. Because it's a session layer. We're talking about not just stateless segments being sent. We have knowledge. We have a session that is established. We're storing the session. That's why Layer 5 is effectively stateful protocol.
+
+    Each segment has sequence one and segment two has sequence two. Segment three has sequence three. They are shoved into an IP Packet. IP Packet has no guaranteed delivery. It doesn't have a fixed path because each path will might go to this router and this router decide, "Oh, this path is a little bit busy and congested limit. Will it send it this another route?".
+
+    So IP packets are just routed. They don't know what's the content of this IP Packet. They don't care. So the IP Packets, while they will take certain path of the destionation and server, are the same, they will take almost the same path. For most scenarios, it's almost the same path. But they can CHANGE.
+
+
+- Multiplexing and demultiplexing
+
+    > IP target hosts only
+    > Hosts run many apps each with different requirements
+    > Ports now identify the "app" or "process"
+    > Sender multiplexes all its apps into TCP connections
+    > Receiver demultiplex TCP segments to each app based on connection pairs
+
+    Host runs many apps and to identify an app you need a port.
+
+    Do we have a connection? Because it will not deliver immediately. It will only deliver if there is a connection.
+
+
+- Connection Establishment
+
+    > App1 on 10.0.0.1 want to send data to AppX on 10.0.0.2
+    > App1 sends SYN to AppX to synchronous sequence numbers
+    > AppX sends SYN/ACK to synchronous its sequence number
+    > App1 ACKs AppX SYN.
+    > Three way handshake
+	
+	
+                       |10.0.0.1|5555|SYN|22|10.0.0.2|
+    |¯¯¯¯¯¯¯|        ---------------------------------->        |¯¯¯¯¯¯¯|
+    |   A   |        |10.0.0.2|5555|SYN/ACK|22|10.0.0.1|        |   B   |
+    |_______|        <----------------------------------        |_______|
+    10.0.0.1           |10.0.0.1|5555|ACK|22|10.0.0.2|          10.0.0.2
+                     ---------------------------------->
+
+
+    10.0.0.1:5555:                                              10.0.0.1:5555:
+    10.0.0.2:22                                                 10.0.0.2:22
+
+    File descriptor                                             File descriptor
+
+
+- Sending Data
+
+    > App1 sends data to AppX
+    > App1 encapsulate the data in a segment and send it
+    > AppX acknowledges the segment
+    > Hint: Can App1 send new segment before ack of old segment arrives?
+
+    |¯¯¯¯¯¯¯|        ---------------------------------->       |¯¯¯¯¯¯¯|
+    |   A   |          |10.0.0.1|5555|ls|22|10.0.0.2|          |   B   |
+    |_______|        <----------------------------------       |_______|
+    10.0.0.1           |10.0.0.2|5555|ACK|22|10.0.0.1|         10.0.0.2
+
+
+    10.0.0.1:5555:                                              10.0.0.1:5555:
+    10.0.0.2:22                                                 10.0.0.2:22
+
+    File descriptor                                             File descriptor
+
+
+- Acknowledgement
+
+    > App1 sends segment 1,2 and 3 to AppX
+    > AppX acknowledge all of them with a single ACK3
+
+                      --------------------------------->       
+    |¯¯¯¯¯¯¯|          |10.0.0.1|5555|seq1|22|10.0.0.2|        |¯¯¯¯¯¯¯|
+    |   A   |          |10.0.0.1|5555|seq2|22|10.0.0.2|        |   B   |     
+    |_______|          |10.0.0.1|5555|seq3|22|10.0.0.2|        |_______|
+    10.0.0.1                                                   10.0.0.2
+                      <---------------------------------           
+                       |10.0.0.2|5555|ACK3|22|10.0.0.1|         
+
+    ACK3 means host have been recieved seq1, seq2 and seq3.
+
+- Lost Data
+
+    > App1 sends segment 1,2 and 3 to AppX
+    > Seg 3 is lost, AppX acknowledge 2
+    > App1 resend Seg 3
+
+                      --------------------------------->       
+    |¯¯¯¯¯¯¯|          |10.0.0.1|5555|seq1|22|10.0.0.2|                 |¯¯¯¯¯¯¯|
+    |   A   |          |10.0.0.1|5555|seq2|22|10.0.0.2|                 |   B   |     
+    |_______|          |10.0.0.1|5555|seq3|22|10.0.0.2|XXX(LOST)        |_______|
+    10.0.0.1                                                            10.0.0.2
+                      <---------------------------------           
+                       |10.0.0.2|5555|ACK2|22|10.0.0.1|        
+
+                      --------------------------------->       
+                       |10.0.0.1|5555|seq3|22|10.0.0.2|
+                      <---------------------------------           
+                       |10.0.0.2|5555|ACK3|22|10.0.0.1|     
+
+    This is the retransmission logic.
+
+
+- Closing Connection
+
+    > App1 wants to close the connection
+    > App1 sends FIN, AppX ACK
+    > AppX sends FIN, App1 ACK
+    > Four way handshake.
+
+                      --------------------------------->       
+    |¯¯¯¯¯¯¯|          |10.0.0.1|5555|FIN|22|10.0.0.2|          |¯¯¯¯¯¯¯|
+    |   A   |         <---------------------------------        |   B   |     
+    |_______|          |10.0.0.2|5555|ACK|22|10.0.0.1|          |_______|
+    10.0.0.1          <---------------------------------        10.0.0.2
+                       |10.0.0.2|5555|FIN|22|10.0.0.1|
+                      --------------------------------->       
+                       |10.0.0.1|5555|ACK|22|10.0.0.2|        
+                                                                
+
+    If you open a connection, you have to close it.

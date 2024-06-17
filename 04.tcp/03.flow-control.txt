@@ -1,0 +1,119 @@
+- Flow Control
+
+    How much data the receiver can handle?
+
+    > A want to send 10 segments to B
+    > A sends segment 1 to B
+    > B acknowledges segment 1
+    > A sends segment 2 to B
+    > B acknowledges segment 2
+    > VERY SLOW
+
+                                    SEG1
+                      --------------------------------->       
+    |¯¯¯¯¯¯¯|                       ACK1                          |¯¯¯¯¯¯¯|
+    |   A   |         <---------------------------------          |   B   |     
+    |_______|                       SEG2                          |_______|
+                      ---------------------------------> 
+                                    ACK2
+                      <---------------------------------  
+                                    SEG3         
+                      --------------------------------->
+                                    ACK3 
+                      <---------------------------------  
+
+
+    > We need to be able to send multiple segments and then get one ACK. Because now we can take the latency once, with seven segments for example, and then wait.
+    > Now we agree that we can send multiple segments. But the question is how much that can we send?
+
+    > A can send multiple segments and B can acknowledge all in 1 ACK.
+    > This is called "flow control"
+
+
+                              SEG1 | SEG2 | SEG2
+                      --------------------------------->       
+    |¯¯¯¯¯¯¯|                       ACK3                          |¯¯¯¯¯¯¯|
+    |   A   |         <---------------------------------          |   B   |     
+    |_______|                                                     |_______|
+
+
+
+    > The flow control is the window that the guy A need to maintain, such that B is not overloaded with packets.
+
+
+    > When TCP segments arrive they are put in receiver's buffer.
+    > If we kept sending data the receiver will be overwhelmed.
+    > Segments will be dropped.
+    > Solution? Let the sender know how much you can handle. (!Hey, I can handle 8000 bytes.)
+
+
+- Flow Control Window Size (Receiver Window)
+
+    Window size section in the TCP segment that we can see it in the lecture 02.tcp-segment.
+
+    Receiver sends a segment replying or an acknowledgement or something and it can include its window size in the acknowledgement.
+
+    Actually both guys do. Not just the receiver because everyone is a sender or receiver in TCP because it's a bidirectional protocol.
+
+
+- Window Size (Receiver Window) RWND
+
+    > 16 bit - Up to 64KB
+    > Updated with each acknowledgement
+    > Tells the sender how much to send before waiting for ACK
+    > Receiver can decide to decrease the Window Size (out of memory) more important stuff
+
+    > We are not the only one talking to receiver. It might be has thousands of other clients and thousands of other connections.
+    > So receiver tell us if it is full, if it decided halway through that, hey!, other my applications are taking a lot of memory so I'm gonna reduce this! OR, hey!, I have a lot of little more buffer now. Send more data!
+
+    > So the receiver windows are always changing and the client is always notified of this new change.
+
+                                      1
+                      --------------------------------->       
+    |¯¯¯¯¯¯¯|               ACK1 (Window size 3 segs (bytes))     |¯¯¯¯¯¯¯|
+    |   A   |         <---------------------------------          |   B   |     
+    |_______|                     2 | 3 | 4                       |_______|
+                      ---------------------------------> 
+                                    ACK4
+                      <---------------------------------  
+                                  5 | 6 | 7      
+                      --------------------------------->
+                                    ACK7
+                      <---------------------------------  
+
+
+- Sliding Window
+
+    > Can't keep waiting for receiver to acknowledge all segments
+    > Whatever gets aknwoledge moves
+    > We "slide" the window
+    > Sender maintains the sliding window for the receiver
+
+    
+    sliding_window.png IMAGE
+
+    > If we send 1-2-3 and we got acknowledge for 2. That should be enough for us to know how much we can send.
+
+
+- Window Scaling
+
+    > 64 KB is too small
+    > We can't increase the bits on the segment
+    > Meet Window Scaling factor (0-14)
+    > Window Size can go up to 1GB ((2^16 - 1) * 2^14)
+    > Only exchanged during the handshake
+
+    Scaling factor, which is just basically a power factor.
+
+    There is another option in the TCP segments that you can enable and this called the "window scaling" and this is negotiated during the exchange and we'll say, key!, my scaling is 14.
+
+    So what you do is basically multiply 2 to pow 16 which is the window size, whatever the value currently in the window size, multiplied by 2 to pow 14. That is huge as more than enough. Now you can go up to 1GB.
+
+
+- Summary
+
+    > Receiver host has a limit
+    > We need to let the sender know how much it can send
+    > Receiver Window is in the segment
+    > Sender maintains the Sliding Window to know how much it can send
+    > Window Scaling can increase that

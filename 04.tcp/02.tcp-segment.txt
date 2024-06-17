@@ -1,0 +1,66 @@
+- The Anatomy of the TCP Segment
+
+    > TCP segment Header is 20 bytes and can go up to 60 bytes.
+    > TCP segments slides into an IP packet as "data".
+    > Port are 16 bit (0 to 65535)
+    > Sequences, Acknowledgement, Flow Control and more..
+
+
+    --------------------------------------------------------------------------------------------------------------------
+	| Offsets | Octet  |           0           |           1           |           2           |           3           |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|  Octet  |  Bit   |00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    0    |   0    |                   Source Port                 |              Destination Port                 |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    4    |   32   |                                        Sequence Number                                        |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    8    |   64   |                                 Acknowledgement Number (if ACK set)                           |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    12   |   96   |    Data   |Reserved|N |C |E |U |A |P |R |S |F |                  Window Size                  |
+    |         |        |   offset  | 0 0 0  |S |W |C |R |C |S |S |Y |I |                                               |
+    |         |        |           |        |  |R |E |G |K |H |T |N |N |                                               |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    16   |   128  |                    Checksum                   |          Urgent Pointer (if URG set)          |
+	|---------|--------|-----------------------------------------------------------------------------------------------|
+	|    20   |   160  |                                                                                               |
+	|---------|--------|                                 Options (if data offset > 5                                   |
+	|    ..   |   ...  |                               Padded at the end with "0" bits                                 |
+	|---------|--------|                                if necessary.)                                                 |
+	|    60   |   480  |                                                                                               |
+	--------------------------------------------------------------------------------------------------------------------
+
+    https://en.wikipedia.org/wiki/Transmission_Control_Protocol
+    https://datatracker.ietf.org/doc/html/rfc793
+
+    
+
+	Flow Control Window Size: How much does the server effectively can handle? 16bits. That means 65K. That's the maximum default but it can go higher than that. There is a little flag that can make the window size up to 1GB.
+
+	- NINE BIT FLAGS -
+
+	SYN: Initial handshake.
+	FIN: Close the connection.
+	RST: You're sending me something bad? Reset the connection.
+	PSH: You're pushing data.
+	ACK: You're acknowledging something.
+	URG: This segment is urgent.
+	ECE: This is part of the congestion control. Routers not dropping packets in case of congestion by sitting something called the ECN, the congestion notification. With that we're telling the sender that, hey, by the way the road there was about to be a congestion just through careful.
+	CWR: You get to reduce your congestion window. Congestion Window Reduce.
+	NS: The knowns, the notification knowns, which is part of the congestion control.
+
+
+- Maximum Segment Size
+
+	How much data I can send so that it can pack nicely in one segment? It all comes back to the packet size and it all comes back to the "Maximum Transmission Unit" of your network, which is fixed in your network.
+
+	> Segment Size depends the MTU of the network
+	> Usually 512 bytes but can go up to 1460 (The default MTU of the internet is really 1500. 1500 bytes. 1.5 Kilobytes in a single frame.)
+
+	That data includes the IP Packet and include maximum the segment itself. That means include all the garbage headers that the IP has adds, and the segments that are Layer 4 TCP adds.
+
+	20 bytes in the IP and 20 bytes in TCP.
+
+	> Default MTU in the Internet is 1500 (results in MSS 1460)
+	> Jumbo frames MTU goes to 9000 or more
+	> MSS can be larger in jumbo frames cases

@@ -1,0 +1,31 @@
+4. TCP Connection States
+
+	> TCP is a stateful protocol.
+	> Stateful protocol must have states.
+	> Both client and server need to maintain all sorts of state
+	> Window sizes, sequences and the state of the connection
+	> The connection goes through many states
+
+
+- TCP Pros
+
+	> Guarantee delivery
+	> No one can send data without prior knowledge
+	> Flow Control and Congestion Control
+	> Ordered Packets no corruption or app level work
+	> Secure and can't be easily spoofed
+
+
+- TCP Cons
+
+	> Large header overhead compared to UDP (20 byte up to 60 bytes)
+	> More bandwidth
+	> Stateful - consumes memory on server and client
+	> Considered high latency for certain workloads (Slow start/ congestion/ acks)
+	> Does too much at a low level (hence QUIC)
+		*	Single connection to send multiple streams of data (HTTP requests)
+		*	Stream 1 has nothing to do with Stream 2
+		* 	Both Stream 1 and Stream 2 packets must arrive
+	> TCP Meltdown
+		*	Not a good candidate for VPN
+	

@@ -1,0 +1,62 @@
+3. NAT
+
+- Network Address Translation
+	
+	How the WAN (Wide Area Network) sees your internal devices?
+
+	The Network Address Translation (NAT) Table lives in the router and maps the private IP Addresses which is start with "10.0.0" or "192.168" or "172" to a public image so that if Google want to respond back to my machine, that has a private IP Address, it doesn't even know it is actually a private device, it just responds to the public router and gives you the source port, the destination port in this case, and the router does the mapping.
+
+	"Oh, source 7.7.7.7 going to that, that was actually that particular machine"
+
+
+	> IPv4 is limited only 4 billion.
+	> Private vs Public IP Address
+	> E.g. 192.168.x.x, 10.0.0.x is private not routable in the Internet
+	> Internal hosts can be assigned private addresses
+	> Only your router need public IP address
+	> Router need to translate requests
+
+	Routers has both the public and private network address.
+
+
+- NAT Table
+
+	Router:
+		private: 192.168.1.1
+		public: 44.11.5.17
+
+	AAA:
+		private: 192.168.1.2
+
+	FFF:
+		private: 55.11.22.33
+
+	
+	> AAA wants to talk FFFF
+
+
+	|8992|192.168.1.2|
+	|7777|44.11.5.17|GET/|55.11.22.33|8080|
+
+	|192.168.1.2:8892|44.11.5.17:7777|55.11.22.33|
+
+
+	> What is the maximum record in the NAT Table when the same machine want to visit the same destination on the same port?
+	> The same app can only make 65.000 connections
+
+
+- NAT Applications
+
+	> Private to Public translations
+		*	So we don't run out IPv4
+	
+	> Port forwarding
+		*	Add a NAT entry in the router to forward packets to 80 to a machine in your LAN
+		* 	No need to have root access to listen on port 80 on your device
+		* 	Expose your local web server publically
+
+	> Layer 4 Load Balancing
+		*	HAProxy NAT Mode - Your load balancer is your gateway
+		* 	Clients send a request to a bogus service IP
+		* 	Router intercepts that packet and replaces the service IP with a destination server
+		* 	Layer 4 reverse proxying
